@@ -1,11 +1,33 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
 )
+
+type alpr struct {
+	Version        int      `json:"version"`
+	Width          int      `json:"img_width"`
+	Height         int      `json:"img_height"`
+	ProcessingTime float32  `json:"processing_time_ms"`
+	Results        []result `json:"results"`
+}
+
+type result struct {
+	Plate      string  `json:"plate"`
+	Confidence float64 `json:"confidence"`
+}
+
+func processResults(jsons []byte) {
+	var data alpr
+	if err := json.Unmarshal(jsons, &data); err != nil {
+		panic(err)
+	}
+	fmt.Println(data)
+}
 
 func alprImage(filename string) {
 	log.Println("running ALPR on ", filename)
@@ -19,5 +41,6 @@ func alprImage(filename string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("The date is %s\n", out)
+
+	processResults(out)
 }
