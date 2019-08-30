@@ -27,15 +27,7 @@ type plateData struct {
 	Confidence float64 `json:"confidence"`
 }
 
-func processResults(jsons []byte) {
-	var data alpr
-	if err := json.Unmarshal(jsons, &data); err != nil {
-		panic(err)
-	}
-	fmt.Println(data)
-}
-
-func alprImage(filename string) {
+func runALPR(filename *string) ([]byte, error) {
 	log.Println("running ALPR on ", filename)
 
 	dir, err := os.Getwd()
@@ -43,10 +35,34 @@ func alprImage(filename string) {
 		log.Fatal(err)
 	}
 
-	out, err := exec.Command("/usr/bin/alpr", "-j", "-c", "us", fmt.Sprintf("%s/%s", dir, filename)).Output()
+	return exec.Command("/usr/bin/alpr", "-j", "-c", "us", fmt.Sprintf("%s/%s", dir, *filename)).Output()
+}
+
+func processResults(jsons *[]byte) (alpr, error) {
+	var data alpr
+	if err := json.Unmarshal(*jsons, &data); err != nil {
+		return data, err
+	}
+	return data, nil
+}
+
+// Finally post results to MDroid-Core
+func postResults(filename *string, data *alpr) {
+
+}
+
+func alprImage(filename string) {
+	out, err := runALPR(&filename)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return
 	}
 
-	processResults(out)
+	data, resultErr := processResults(&out)
+	if resultErr != nil {
+		log.Println(resultErr)
+		return
+	}
+
+	postResults(&filename, &data)
 }
