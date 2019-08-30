@@ -13,13 +13,18 @@ type alpr struct {
 	Width            int     `json:"img_width"`
 	Height           int     `json:"img_height"`
 	ProcessingTimeMS float32 `json:"processing_time_ms"`
-	Results          result  `json:"results"`
+	Results          results `json:"results"`
 }
 
-type result struct {
-	Plate       string   `json:"plate"`
-	Confidence  float64  `json:"confidence"`
-	Candidiates []result `json:"candidates"`
+type results struct {
+	Plate       string      `json:"plate"`
+	Confidence  float64     `json:"confidence"`
+	Candidiates []plateData `json:"candidates"`
+}
+
+type plateData struct {
+	Plate      string  `json:"plate"`
+	Confidence float64 `json:"confidence"`
 }
 
 func processResults(jsons []byte) {
