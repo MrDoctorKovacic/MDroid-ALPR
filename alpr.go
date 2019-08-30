@@ -9,16 +9,17 @@ import (
 )
 
 type alpr struct {
-	Version        int      `json:"version"`
-	Width          int      `json:"img_width"`
-	Height         int      `json:"img_height"`
-	ProcessingTime float32  `json:"processing_time_ms"`
-	Results        []result `json:"results"`
+	Version          int     `json:"version"`
+	Width            int     `json:"img_width"`
+	Height           int     `json:"img_height"`
+	ProcessingTimeMS float32 `json:"processing_time_ms"`
+	Results          result  `json:"results"`
 }
 
 type result struct {
-	Plate      string  `json:"plate"`
-	Confidence float64 `json:"confidence"`
+	Plate       string   `json:"plate"`
+	Confidence  float64  `json:"confidence"`
+	Candidiates []result `json:"candidates"`
 }
 
 func processResults(jsons []byte) {
