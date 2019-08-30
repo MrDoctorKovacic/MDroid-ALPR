@@ -15,7 +15,7 @@ func alprImage(filename string) {
 		log.Fatal(err)
 	}
 
-	out, err := exec.Command(fmt.Sprintf("/usr/bin/alpr -j -c us %s/%s", dir, filename)).Output()
+	out, err := exec.Command("/usr/bin/alpr", "-j", "-c", "us", fmt.Sprintf("%s/%s", dir, filename)).Output()
 	if err != nil {
 		log.Fatal(err)
 	}
