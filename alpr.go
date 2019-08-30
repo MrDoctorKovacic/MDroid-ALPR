@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"time"
 )
 
 func alprImage(filename string) {
@@ -16,9 +15,7 @@ func alprImage(filename string) {
 		log.Fatal(err)
 	}
 
-	time.Sleep(5 * time.Second)
-
-	out, err := exec.Command(fmt.Sprintf("alpr -j -c us h786poj.jpg")).Output()
+	out, err := exec.Command(fmt.Sprintf("/usr/bin/alpr -j -c us h786poj.jpg")).Output()
 	if err != nil {
 		log.Fatal(err)
 	}
