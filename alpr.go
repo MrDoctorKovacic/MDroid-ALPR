@@ -9,11 +9,11 @@ import (
 )
 
 type alpr struct {
-	Version          int     `json:"version"`
-	Width            int     `json:"img_width"`
-	Height           int     `json:"img_height"`
-	ProcessingTimeMS float32 `json:"processing_time_ms"`
-	Results          results `json:"results"`
+	Version          int       `json:"version"`
+	Width            int       `json:"img_width"`
+	Height           int       `json:"img_height"`
+	ProcessingTimeMS float32   `json:"processing_time_ms"`
+	Result           []results `json:"results"`
 }
 
 type results struct {
