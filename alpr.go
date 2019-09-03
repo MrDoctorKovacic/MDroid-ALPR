@@ -1,11 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
+
+	"github.com/MrDoctorKovacic/MDroid-Core/logging"
 )
 
 type alpr struct {
@@ -48,7 +52,37 @@ func processResults(jsons *[]byte) (alpr, error) {
 
 // Finally post results to MDroid-Core
 func postResults(filename *string, data *alpr) {
+	if len(data.Result) == 0 {
+		MainStatus.Log(logging.Warning(), "Plate has no results, not processing")
+		return
+	}
 
+	makeRequest(&data.Result[0].Plate, &data.Result[0].Confidence)
+	if len(data.Result[0].Candidiates) == 0 {
+		MainStatus.Log(logging.OK(), "Plate has no candidates, stopping at initial values")
+		return
+	}
+
+	for _, result := range data.Result[0].Candidiates {
+		makeRequest(&result.Plate, &result.Confidence)
+	}
+
+	MainStatus.Log(logging.OK(), fmt.Sprintf("Plate has %d candidates, successfully processed.", len(data.Result[0].Candidiates)))
+}
+
+func makeRequest(plate *string, percent *float64) {
+	url := fmt.Sprintf("%s/alpr/%s/", Hostname, *plate)
+	var jsonStr = []byte(fmt.Sprintf(`{"percent":%f}`, *percent))
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("X-Custom-Header", "myvalue")
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		MainStatus.Log(logging.Error(), fmt.Sprintf("Error sending post request: %s", err))
+	}
+	defer resp.Body.Close()
 }
 
 func alprImage(filename string) {
